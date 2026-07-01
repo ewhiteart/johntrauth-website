@@ -7,7 +7,7 @@
     var qs = Object.keys(data).map(function (k) {
       return encodeURIComponent(k) + '=' + encodeURIComponent(data[k]);
     }).join('&');
-    return fetch(BACKEND_URL + '?' + qs);
+    return fetch(BACKEND_URL + '?' + qs, { mode: 'no-cors' });
   }
 
   function showSuccess(formEl, successEl, message) {
