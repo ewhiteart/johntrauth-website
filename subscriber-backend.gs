@@ -4,6 +4,32 @@
 // ============================================================
 
 var NOTIFY_EMAILS = ['johntrauth@gmail.com', 'ewhiteart@gmail.com'];
+var SPREADSHEET_NAME = 'John Trauth Subscribers';
+
+function getSheet() {
+  var ss;
+
+  // Works if script was created from inside Google Sheets
+  try { ss = SpreadsheetApp.getActiveSpreadsheet(); } catch (e) {}
+
+  // Standalone fallback: find or create the spreadsheet in Drive
+  if (!ss) {
+    var files = DriveApp.getFilesByName(SPREADSHEET_NAME);
+    if (files.hasNext()) {
+      ss = SpreadsheetApp.open(files.next());
+    } else {
+      ss = SpreadsheetApp.create(SPREADSHEET_NAME);
+    }
+  }
+
+  var sheet = ss.getSheetByName('Subscribers');
+  if (!sheet) {
+    sheet = ss.insertSheet('Subscribers');
+    sheet.appendRow(['Date', 'Email', 'Name', 'Message', 'Source']);
+    sheet.getRange('1:1').setFontWeight('bold');
+  }
+  return sheet;
+}
 
 function doPost(e) {
   try {
@@ -13,29 +39,15 @@ function doPost(e) {
     var message = (p.message || '').trim();
     var source  = (p.source  || 'subscribe').trim();
 
-    // Write to Google Sheet
-    var ss    = SpreadsheetApp.getActiveSpreadsheet();
-    var sheet = ss.getSheetByName('Subscribers');
-    if (!sheet) {
-      sheet = ss.insertSheet('Subscribers');
-      sheet.appendRow(['Date', 'Email', 'Name', 'Message', 'Source']);
-      sheet.getRange('1:1').setFontWeight('bold');
-    }
-    sheet.appendRow([new Date(), email, name, message, source]);
+    getSheet().appendRow([new Date(), email, name, message, source]);
 
-    // Send email for contact-form submissions
     if (source === 'contact' && email) {
       MailApp.sendEmail({
         to: NOTIFY_EMAILS[0],
         cc: NOTIFY_EMAILS.slice(1).join(','),
         replyTo: email,
         subject: 'New message via johntrauth.com — ' + (name || email),
-        body: [
-          'From:    ' + name,
-          'Email:   ' + email,
-          '',
-          message
-        ].join('\n')
+        body: ['From:    ' + name, 'Email:   ' + email, '', message].join('\n')
       });
     }
 
@@ -50,7 +62,6 @@ function doPost(e) {
   }
 }
 
-// Health-check — lets you test the URL in a browser
 function doGet() {
   return ContentService.createTextOutput('OK');
 }
