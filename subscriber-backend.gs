@@ -2,14 +2,11 @@
 // John Trauth — Subscriber Backend (Google Apps Script)
 // Deploy as a Web App: Execute as Me, Anyone can access
 //
-// SETUP: Run the setup() function once from the editor before
-// deploying. This authorizes all required permissions and
-// creates the spreadsheet.
+// SETUP: Run setup() once from the editor before deploying.
 // ============================================================
 
 var NOTIFY_EMAILS = ['johntrauth@gmail.com', 'ewhiteart@gmail.com'];
 
-// Run this ONCE from the editor (Run → setup) before deploying
 function setup() {
   var props = PropertiesService.getScriptProperties();
   var ss = SpreadsheetApp.create('John Trauth Subscribers');
@@ -21,15 +18,20 @@ function setup() {
 }
 
 function getSheet() {
-  var props = PropertiesService.getScriptProperties();
-  var ssId = props.getProperty('SPREADSHEET_ID');
-  var ss = SpreadsheetApp.openById(ssId);
-  return ss.getSheetByName('Subscribers');
+  var id = PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID');
+  return SpreadsheetApp.openById(id).getSheetByName('Subscribers');
 }
 
-function doPost(e) {
+// All form submissions use GET (POST is blocked by Google for external callers)
+function doGet(e) {
+  var p = e.parameter;
+
+  // Health check — no email param
+  if (!p || !p.email) {
+    return ContentService.createTextOutput('OK');
+  }
+
   try {
-    var p = e.parameter;
     var email   = (p.email   || '').trim();
     var name    = (p.name    || '').trim();
     var message = (p.message || '').trim();
@@ -56,8 +58,4 @@ function doPost(e) {
       .createTextOutput(JSON.stringify({ status: 'error', message: err.toString() }))
       .setMimeType(ContentService.MimeType.JSON);
   }
-}
-
-function doGet() {
-  return ContentService.createTextOutput('OK');
 }
