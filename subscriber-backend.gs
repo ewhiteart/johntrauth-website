@@ -1,34 +1,30 @@
 // ============================================================
 // John Trauth — Subscriber Backend (Google Apps Script)
 // Deploy as a Web App: Execute as Me, Anyone can access
+//
+// SETUP: Run the setup() function once from the editor before
+// deploying. This authorizes all required permissions and
+// creates the spreadsheet.
 // ============================================================
 
 var NOTIFY_EMAILS = ['johntrauth@gmail.com', 'ewhiteart@gmail.com'];
-var SPREADSHEET_NAME = 'John Trauth Subscribers';
+
+// Run this ONCE from the editor (Run → setup) before deploying
+function setup() {
+  var props = PropertiesService.getScriptProperties();
+  var ss = SpreadsheetApp.create('John Trauth Subscribers');
+  props.setProperty('SPREADSHEET_ID', ss.getId());
+  var sheet = ss.insertSheet('Subscribers');
+  sheet.appendRow(['Date', 'Email', 'Name', 'Message', 'Source']);
+  sheet.getRange('1:1').setFontWeight('bold');
+  Logger.log('✅ Setup complete. Spreadsheet: ' + ss.getUrl());
+}
 
 function getSheet() {
-  var ss;
-
-  // Works if script was created from inside Google Sheets
-  try { ss = SpreadsheetApp.getActiveSpreadsheet(); } catch (e) {}
-
-  // Standalone fallback: find or create the spreadsheet in Drive
-  if (!ss) {
-    var files = DriveApp.getFilesByName(SPREADSHEET_NAME);
-    if (files.hasNext()) {
-      ss = SpreadsheetApp.open(files.next());
-    } else {
-      ss = SpreadsheetApp.create(SPREADSHEET_NAME);
-    }
-  }
-
-  var sheet = ss.getSheetByName('Subscribers');
-  if (!sheet) {
-    sheet = ss.insertSheet('Subscribers');
-    sheet.appendRow(['Date', 'Email', 'Name', 'Message', 'Source']);
-    sheet.getRange('1:1').setFontWeight('bold');
-  }
-  return sheet;
+  var props = PropertiesService.getScriptProperties();
+  var ssId = props.getProperty('SPREADSHEET_ID');
+  var ss = SpreadsheetApp.openById(ssId);
+  return ss.getSheetByName('Subscribers');
 }
 
 function doPost(e) {
