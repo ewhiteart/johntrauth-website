@@ -28,6 +28,7 @@
   if (subscribeForm) {
     subscribeForm.addEventListener('submit', function (e) {
       e.preventDefault();
+      e.stopImmediatePropagation();
       var email = subscribeForm.querySelector('[name="email"]').value;
       var btn   = document.getElementById('Subscribe');
       var done  = subscribeForm.parentNode.querySelector('.w-form-done');
@@ -45,6 +46,7 @@
   if (contactForm) {
     contactForm.addEventListener('submit', function (e) {
       e.preventDefault();
+      e.stopImmediatePropagation();
       var name    = contactForm.querySelector('[name="Name"]').value;
       var email   = contactForm.querySelector('[name="email"]').value;
       var message = contactForm.querySelector('[name="Message"]').value;
