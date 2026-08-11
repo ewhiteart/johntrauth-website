@@ -33,9 +33,10 @@
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
-        name:    nameEl.value,
-        email:   emailEl.value,
-        message: msgEl.value
+        _subject: 'New message via johntrauth.com — ' + (nameEl.value || emailEl.value),
+        Name:     nameEl.value,
+        email:    emailEl.value,
+        Message:  msgEl.value
       })
     })
     .then(function (r) { return r.json(); })
