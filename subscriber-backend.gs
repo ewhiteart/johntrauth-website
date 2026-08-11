@@ -2,24 +2,15 @@
 // John Trauth — Subscriber Backend (Google Apps Script)
 // Deploy as a Web App: Execute as Me, Anyone can access
 //
-// SETUP: Run setup() once from the editor before deploying.
+// No setup() needed — spreadsheet ID is hardcoded below.
 // ============================================================
 
-var NOTIFY_EMAILS = ['johntrauth@gmail.com', 'ewhiteart@gmail.com'];
-
-function setup() {
-  var props = PropertiesService.getScriptProperties();
-  var ss = SpreadsheetApp.create('John Trauth Subscribers');
-  props.setProperty('SPREADSHEET_ID', ss.getId());
-  var sheet = ss.insertSheet('Subscribers');
-  sheet.appendRow(['Date', 'Email', 'Name', 'Message', 'Source']);
-  sheet.getRange('1:1').setFontWeight('bold');
-  Logger.log('✅ Setup complete. Spreadsheet: ' + ss.getUrl());
-}
+var SPREADSHEET_ID  = '1szKoMHrBrEwgCmppsp4WZGOziKMd-eya7ni2uhjpFzc';
+var SHEET_NAME      = 'Subscribers';
+var NOTIFY_EMAILS   = ['johntrauth@gmail.com', 'ewhiteart@gmail.com'];
 
 function getSheet() {
-  var id = PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID');
-  return SpreadsheetApp.openById(id).getSheetByName('Subscribers');
+  return SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAME);
 }
 
 // All form submissions use GET (POST is blocked by Google for external callers)
